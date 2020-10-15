@@ -40,6 +40,9 @@ typedef struct			s_trace
 	struct sockaddr_in	from;
 	int					ttl;
 	struct timeval		tsent;
+	ssize_t				size;
+	char				*hostname;
+	char				*hostaddr;
 }						t_trace;
 
 typedef struct		s_env
@@ -47,33 +50,33 @@ typedef struct		s_env
 	char			*hostname;
 	char			*hostaddr;
 	struct addrinfo	*res;
-	bool			loop;
-	int				hmax;
-	int				psize;
 	int				pid;
 	t_trace			icmp;
+	t_trace			p_icmp;
 	int				seqnum;
 	int				maxtries;
 	int				maxhops;
 }					t_env;
 
+void				setup_env(t_env *env);
 char 				*parse_args(int argc, char **argv);
 void				display_help();
 struct addrinfo		*dns_lookup(t_env *env, const char *host);
-char				*reverse_dns_lookup(char *hostname, char *s_ipv4_addr);
+char				*reverse_dns_lookup(char *s_ipv4_addr);
 void				sendloop(t_env *env);
 void				InterruptHandler();
 
-// SEND ECHO
+void				send_probes(t_env *env, fd_set *readset);
 int					send_echo(t_env *env);
-int					recieve_echo(t_trace *t);
-// CHECKSUM
+int					read_echo(t_env *env, int try);
+
+int					sameprevious(t_env *env);
+void				setprevious(t_env *env);
+
 unsigned short		checksum(void *buffer, int size);
 void				ttl_advance(t_trace * icmp);
 
-
-// SET TO AF_UNSPEC FOR IPv4 and IPv6 
-//SAME TIME SUB
-//probe packets with a small ttl
+double				ft_timediff(struct timeval s, struct timeval e);
+void				ft_freeaddrinfo(struct addrinfo *head);
 
 #endif

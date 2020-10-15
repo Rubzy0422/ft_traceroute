@@ -1,19 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   interrupt.c                                        :+:      :+:    :+:   */
+/*   ft_freeaddrinfo.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/13 07:34:26 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/14 09:34:34 by rcoetzer         ###   ########.fr       */
+/*   Created: 2020/10/08 12:40:47 by rcoetzer          #+#    #+#             */
+/*   Updated: 2020/10/13 16:39:55 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <ft_traceroute.h>
 
-void	InterruptHandler()
+void	ft_freeaddrinfo(struct addrinfo *head)
 {
-	printf("\n");
-	exit(0);
+	struct addrinfo	*tmp;
+
+	while (head != NULL)
+	{
+		tmp = head->ai_next;
+		free(head);
+		head = tmp;
+	}
 }

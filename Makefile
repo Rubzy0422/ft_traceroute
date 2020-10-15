@@ -5,22 +5,24 @@
 #                                                     +:+ +:+         +:+      #
 #    By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/06/27 17:28:44 by stenner           #+#    #+#              #
-#    Updated: 2020/10/13 07:38:24 by rcoetzer         ###   ########.fr        #
+#    Created: 2020/10/15 12:47:14 by rcoetzer          #+#    #+#              #
+#    Updated: 2020/10/15 13:49:42 by rcoetzer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_traceroute
 
 SRC_PATH = ./src/
-FLAGS = -g -Wall -Werror -Wextra
+FLAGS = -g
 
 
 SRC_NAME =	ft_traceroute.c\
 			addressinfo.c\
 			packet.c\
 			traffic.c\
-			interrupt.c
+			interrupt.c\
+			time.c\
+			ft_freeaddrinfo.c
 
 LIBFT_PATH = ./libft/
 

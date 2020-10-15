@@ -6,18 +6,18 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 08:32:52 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/09 08:47:49 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/15 12:19:25 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <ft_traceroute.h>
 
-void *handelerrcode(int errcode, const char *hostname)
+void	*handelerrcode(int errcode, const char *hostname)
 {
 	if (errcode == -2)
 		printf("%s: %s: Name or service not known\n", P_NAME, hostname);
 	else if (errcode == -3)
-		printf("%s: %s: Temporary failure in name resolution\n", P_NAME, hostname);
+			printf("%s: Temporary failure in name resolution\n", hostname);
 	else
 		printf("%s: %s: Unknown Error\n", P_NAME, hostname);
 	exit(-1);
@@ -45,24 +45,25 @@ struct addrinfo	*dns_lookup(t_env *env, const char *host)
 	if (res->ai_family == AF_INET)
 		ptr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
 	inet_ntop (res->ai_family, ptr, addrstr, NI_MAXHOST);
-	env->hostaddr = addrstr;
+	env->hostaddr = ft_strdup(addrstr);
 	return res;
 }
 
-char* reverse_dns_lookup(char *hostname, char *s_ipv4_addr) 
+char	*reverse_dns_lookup(char *s_ipv4_addr) 
 { 
 	struct sockaddr_in ip4addr;
-
+	char host[NI_MAXHOST];
+	char service[NI_MAXSERV];
+	int s;
+	
 	ft_bzero(&ip4addr, sizeof(struct sockaddr_in));
 	ip4addr.sin_family = AF_INET;
 	ip4addr.sin_port = htons(0);
 	inet_pton(AF_INET, s_ipv4_addr, &ip4addr.sin_addr);
-	char host[NI_MAXHOST];
-	char service[NI_MAXSERV];
-	int s = getnameinfo((struct sockaddr *) &ip4addr,sizeof(struct sockaddr_in),
+	s = getnameinfo((struct sockaddr *) &ip4addr,sizeof(struct sockaddr_in),
 	host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV);
 	if (s == 0)
 		return ft_strdup(host);
 	else
-		return hostname;
+		return s_ipv4_addr;
 }

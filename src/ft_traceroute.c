@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/08 16:12:22 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/13 10:41:39 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/15 13:51:41 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,22 +19,7 @@ int main(int argc, char **argv)
 	env.hostname = parse_args(argc,argv);
 	if (env.hostname == NULL)
 		display_help();
-	if (getuid())
-	{
-		printf("You must be root to execute this program\n");
-		exit(0);
-	}
-	env.psize = 60;
-	env.pid = getpid() & 0xffff;
-	env.res = dns_lookup(&env, env.hostname);
-	env.icmp.to = *(struct sockaddr_in *)env.res->ai_addr;
-	env.icmp.ttl = 1;
-	env.seqnum = -1;
-	env.maxtries = 3;
-	env.maxhops = 30;
-	
-	// Setup socket 
-	env.icmp.icmpfd = socket (PF_INET, SOCK_RAW, IPPROTO_ICMP);
+	setup_env(&env);
 	if (env.icmp.icmpfd < 0)
 		printf("Socket could not be created");
 
@@ -43,13 +28,32 @@ int main(int argc, char **argv)
 		printf("Could not prepare TTL socket!\n");
 
 	// If socket setup success
-	printf("%s to %s (%s), %d hops max, %d byte packets\n",
-	argv[0], env.hostname, env.hostaddr, env.maxhops, env.psize);
+	printf("%s to %s (%s), %d hops max, %d byte packets\n", 
+	argv[0], env.hostname, env.hostaddr, env.maxhops, PING_PKT_SIZE);
 	signal(SIGINT, InterruptHandler);
-
+	
 	sendloop(&env);
+	ft_freeaddrinfo(env.res);
 }
 
+void	setup_env(t_env *env)
+{
+	if (getuid())
+	{
+		printf("You must be root to execute this program\n");
+		exit(0);
+	}
+	env->pid = getpid() & 0xffff;
+	env->res = dns_lookup(env, env->hostname);
+	env->seqnum = -1;
+	env->maxtries = 3;
+	env->maxhops = 30;
+	env->icmp.to = *(struct sockaddr_in *)env->res->ai_addr;
+	env->icmp.ttl = 1;
+	env->p_icmp.hostaddr = NULL;
+	env->p_icmp.hostname = NULL;
+	env->icmp.icmpfd = socket (PF_INET, SOCK_RAW, IPPROTO_ICMP);
+}
 char 	*parse_args(int argc, char **argv)
 {
 	int		i;
@@ -69,7 +73,8 @@ char 	*parse_args(int argc, char **argv)
 					display_help();
 			}
 		else
-			str_destAddr = argv[i]; 
+			if (str_destAddr == NULL)
+				str_destAddr = argv[i]; 
 	return str_destAddr;
 }
 

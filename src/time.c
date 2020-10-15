@@ -1,19 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   interrupt.c                                        :+:      :+:    :+:   */
+/*   time.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/13 07:34:26 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/14 09:34:34 by rcoetzer         ###   ########.fr       */
+/*   Created: 2020/10/06 11:08:18 by rcoetzer          #+#    #+#             */
+/*   Updated: 2020/10/13 13:15:47 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <ft_traceroute.h>
 
-void	InterruptHandler()
+double ft_timediff(struct timeval s, struct timeval e)
 {
-	printf("\n");
-	exit(0);
+	double seconds;
+	double micro;
+
+	seconds = (double)((e.tv_sec - s.tv_sec))*1000;
+	micro = (double)((e.tv_usec - s.tv_usec)) / 1000;
+	return (double)(seconds + micro);
 }
