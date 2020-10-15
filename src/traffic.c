@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/12 08:20:32 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/15 14:49:04 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/15 17:26:36 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,16 @@ void	sendloop(t_env *env)
 	
 	while (hop <= env->maxhops)
 	{
-		if (!sameprevious(env))
-		{
-			printf(" %d ", hop);
-			setprevious(env);
-			send_probes(env, &readset);
-			printf("\n");
-		}
+		setprevious(env);
+		send_probes(env, &readset, hop);
+		printf("\n");
 		ttl_advance(&env->icmp);
 		hop++;
 	}
 	return;
 }
 
-void	send_probes(t_env *env, fd_set *readset)
+void	send_probes(t_env *env, fd_set *readset, int hop)
 {
 	int try;
 	int ret;
@@ -59,7 +55,7 @@ void	send_probes(t_env *env, fd_set *readset)
 		}
 		if (ret > 0)
 			if (FD_ISSET(env->icmp.icmpfd, readset))
-		 		read_echo(env, try);
+		 		read_echo(env, try, hop);
 		try++;
 	}
 }

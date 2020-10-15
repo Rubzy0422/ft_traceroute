@@ -56,6 +56,7 @@ typedef struct		s_env
 	int				seqnum;
 	int				maxtries;
 	int				maxhops;
+	char			*str;
 }					t_env;
 
 void				setup_env(t_env *env);
@@ -66,9 +67,9 @@ char				*reverse_dns_lookup(char *s_ipv4_addr);
 void				sendloop(t_env *env);
 void				InterruptHandler();
 
-void				send_probes(t_env *env, fd_set *readset);
+void				send_probes(t_env *env, fd_set *readset, int hop);
 int					send_echo(t_env *env);
-int					read_echo(t_env *env, int try);
+int					read_echo(t_env *env, int try, int hop);
 
 int					sameprevious(t_env *env);
 void				setprevious(t_env *env);

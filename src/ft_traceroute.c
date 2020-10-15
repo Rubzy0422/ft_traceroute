@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/08 16:12:22 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/15 13:51:41 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/15 15:46:50 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ void	setup_env(t_env *env)
 	env->p_icmp.hostname = NULL;
 	env->icmp.icmpfd = socket (PF_INET, SOCK_RAW, IPPROTO_ICMP);
 }
+
 char 	*parse_args(int argc, char **argv)
 {
 	int		i;

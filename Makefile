@@ -5,18 +5,19 @@
 #                                                     +:+ +:+         +:+      #
 #    By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/10/15 12:47:14 by rcoetzer          #+#    #+#              #
-#    Updated: 2020/10/15 13:49:42 by rcoetzer         ###   ########.fr        #
+#    Created: 2020/10/15 18:06:44 by rcoetzer          #+#    #+#              #
+#    Updated: 2020/10/15 18:23:00 by rcoetzer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = ft_traceroute
+NAME		=	ft_traceroute
+CC			= 	gcc
+FLAGS		=	-Wall -Wextra -Werror -g -MMD
 
-SRC_PATH = ./src/
-FLAGS = -g
+SRCDIR		=	src/
+OBJDIR		=	obj/
 
-
-SRC_NAME =	ft_traceroute.c\
+SRCFILES	=	ft_traceroute.c\
 			addressinfo.c\
 			packet.c\
 			traffic.c\
@@ -24,42 +25,55 @@ SRC_NAME =	ft_traceroute.c\
 			time.c\
 			ft_freeaddrinfo.c
 
-LIBFT_PATH = ./libft/
+SRCS		=	$(addprefix $(SRCDIR), $(SRCFILES))
+OBJS		=	$(addprefix $(OBJDIR), $(SRCFILES:.c=.o))
 
-INCLUDES =	-I ./inc/ \
-			-I $(LIBFT_PATH)/includes/
-				   
-LIBS = $(LIBFT_PATH)libft.a
-CC = gcc
+LIBFT_DIR	=	./libft/
+LIBFT_LIB	=	$(LIBFT_DIR)libft.a
 
-SRC = $(addprefix $(SRC_PATH), $(SRC_NAME))
-SRCO = $(patsubst %.c, %.o, $(SRC))
+INCS		=	-I inc -I $(LIBFT_DIR)/includes
 
-all:$(LIBFT_PATH)libft.a $(NAME) 
+############################################## COLORS 
 
-$(NAME): $(SRCO)
-	@$(CC) $(FLAGS) $(SRCO) $(LIBS) -o $(NAME)
-	@printf "\e[32mBinary \e[1;32m$(NAME)\e[1;0m\e[32m Created.\e[0m\n"
+Black =  \u001b[30;1m
+Red =  \u001b[31;1m
+Green =  \u001b[32;1m
+Yellow =  \u001b[33;1m
+Blue =  \u001b[34;1m
+Magenta =  \u001b[35;1m
+Cyan =  \u001b[36;1m
+White =  \u001b[37;1m
+Reset = \u001b[0m
 
 
-$(LIBFT_PATH):
-	@git clone http://github.com/rubzy0422/libft 
+all: $(NAME)
 
-$(LIBFT_PATH)libft.a: $(LIBFT_PATH) 
-	@make -C $(LIBFT_PATH)
-	
-$(SRC_PATH)%.o: $(SRC_PATH)%.c 
-	@gcc $(FLAGS) -c $< -o $@ $(INCLUDES)
+$(LIBFT_LIB): $(LIBFT_DIR)
+	@make -C $(LIBFT_DIR)
+
+$(LIBFT_DIR):
+	@git clone http://gihub.com/rubzy0422/libft.git 
+
+$(NAME): $(LIBFT_LIB) $(OBJDIR) $(OBJS)
+	@$(CC) -lm $(FLAGS) -o $(NAME) $(OBJS) $(LIBFT_LIB)
+	@echo COMPILED $(NAME)
+
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
+	@mkdir -p $(dir $(OBJS))
+
+$(OBJDIR)%.o : $(SRCDIR)%.c | $(OBJDIR)
+	@$(CC) $(FLAGS) -c $< -o $@ $(INCS)
+	@echo COMPILED $@
 
 clean:
-	@/bin/rm -rf $(SRCO)
-	@printf "\e[31mObjects Files \e[1;31m$(OBJS_LIST)\e[1;0m\e[31mRemoved.\e[0m\n"
+	@make -C $(LIBFT_DIR) clean
+	@rm -rf $(OBJDIR)
 
-fclean: clean
-	@make -C $(LIBFT_PATH)/ fclean
-	@/bin/rm -rf $(NAME)
-	@printf "\e[31mBin \e[1;31m$(NAME)\e[1;0m\e[31m Removed.\e[0m\n"
+fclean:		clean
+	@make -C $(LIBFT_DIR) fclean
+	@rm -rf $(NAME)
 
-re: fclean all
+re:	fclean all
 
-.PHONY: all fclean clean re LIBFT VECLIB init destroy 
+.PHONY: all clean fclean re

@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/12 08:20:09 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/15 14:45:23 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/15 18:06:14 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,31 @@ unsigned short checksum(void *b, int len)
 	return result; 
 } 
 
-int	send_echo(t_env *env)
+ping_pkt	init_icmp(t_env *env)
 {
-	struct ping_pkt pckt;
+	ping_pkt pckt;
 	int i;
+	
 	ft_bzero(&pckt, sizeof(pckt)); 
 	pckt.hdr.type = ICMP_ECHO;
 	pckt.hdr.code = 0;
 	pckt.hdr.un.echo.id = env->pid; 
+	
 	i = 0;
 	while(i++ < (int)sizeof(pckt.msg)-1) 
 		pckt.msg[i] = i+'0';
+
 	pckt.msg[i] = 0;
 	pckt.hdr.un.echo.sequence = ++env->seqnum;
 	pckt.hdr.checksum = checksum(&pckt, sizeof(pckt));
+	return pckt;
+}
+
+int	send_echo(t_env *env)
+{
+	struct ping_pkt pckt;
+
+	pckt = init_icmp(env);
 	gettimeofday(&env->icmp.tsent, NULL);
 	env->icmp.size = sendto(env->icmp.icmpfd, &pckt.hdr, sizeof(pckt), 0,
 		(struct sockaddr *)env->res->ai_addr, sizeof(struct sockaddr));
@@ -55,7 +66,7 @@ int	send_echo(t_env *env)
 	return true;
 }
 
-int	read_echo(t_env *env, int try)
+int	read_echo(t_env *env, int try, int hop)
 {
 	char buf[PING_PKT_SIZE];
 	struct sockaddr_in r_addr;
@@ -71,17 +82,15 @@ int	read_echo(t_env *env, int try)
 		
 		if (try == 0)
 		{
-			printf(" %s (%s)  ", env->icmp.hostname, env->icmp.hostaddr);
+			if (sameprevious(env))
+				exit(0);
+			printf(" %d  %s (%s)  ", hop, env->icmp.hostname, env->icmp.hostaddr);
 		}
-		struct ping_pkt * pckt = (struct ping_pkt *)((void *)buf + sizeof(struct ip ));
-		if (pckt->hdr.type == ICMP_TIME_EXCEEDED || pckt->hdr.type == ICMP_HOST_UNREACH || pckt->hdr.type == 0 || pckt->hdr.type == 8)
-		{
+		//struct ping_pkt * pckt = (struct ping_pkt *)((void *)buf + sizeof(struct ip ));
+		//if (pckt->hdr.type == 11 || pckt->hdr.type == 3 || pckt->hdr.type == 0)
+		//{
 			printf("  %.3f ms", triptime);
-		}
-
-		//VALIDATE ICMP ECHO REPLY || HOST_UNREACH
-		//printf("BUFF:\n\n==START==\n\n%s\n\n==END==\n\n", buf);
-
+		//}
 	}
 	else
 		perror("Recvfrom");
@@ -92,10 +101,7 @@ int		sameprevious(t_env *env)
 {
 	if (env->icmp.hostaddr && env->p_icmp.hostaddr)
 		if (!ft_strcmp(env->p_icmp.hostaddr, env->icmp.hostaddr))
-		{
-			printf("STOP!");
-			return true;	
-		}
+			return true;
 	return false;
 }
 
@@ -106,7 +112,9 @@ void	setprevious(t_env *env)
 		free(env->p_icmp.hostname);
 		free(env->p_icmp.hostaddr);
 	}
-	env->p_icmp.hostname = ft_strdup(env->icmp.hostname);
-	env->p_icmp.hostaddr = ft_strdup(env->icmp.hostaddr);
+	if (env->icmp.hostname)
+		env->p_icmp.hostname = ft_strdup(env->icmp.hostname);
+	if (env->icmp.hostaddr)
+		env->p_icmp.hostaddr = ft_strdup(env->icmp.hostaddr);
 }
 
