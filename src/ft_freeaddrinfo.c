@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/08 12:40:47 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/13 16:39:55 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/19 15:28:09 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	ft_freeaddrinfo(struct addrinfo *head)
 {
+	//freeaddrinfo(head);
+	
 	struct addrinfo	*tmp;
 
 	while (head != NULL)

@@ -1,29 +1,30 @@
 # **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/10/15 18:06:44 by rcoetzer          #+#    #+#              #
-#    Updated: 2020/10/15 18:23:00 by rcoetzer         ###   ########.fr        #
-#                                                                              #
+#																			  #
+#														 :::	  ::::::::	#
+#	Makefile										   :+:	  :+:	:+:	#
+#													 +:+ +:+		 +:+	  #
+#	By: rcoetzer <rcoetzer@student.wethinkcode.	+#+  +:+	   +#+		 #
+#												 +#+#+#+#+#+   +#+			#
+#	Created: 2020/10/15 18:06:44 by rcoetzer		  #+#	#+#			  #
+#	Updated: 2020/10/17 11:00:16 by rcoetzer		 ###   ########.fr		#
+#																			  #
 # **************************************************************************** #
 
 NAME		=	ft_traceroute
 CC			= 	gcc
-FLAGS		=	-Wall -Wextra -Werror -g -MMD
+FLAGS		=	-Wall -Werror -Wextra -g -MMD
 
 SRCDIR		=	src/
 OBJDIR		=	obj/
 
-SRCFILES	=	ft_traceroute.c\
-			addressinfo.c\
-			packet.c\
-			traffic.c\
-			interrupt.c\
-			time.c\
-			ft_freeaddrinfo.c
+SRCFILES	=	addrinfo.c\
+				ft_traceroute.c\
+				packet.c\
+				time.c\
+				traffic.c\
+				utils.c\
+				packet_handel.c\
+				ft_freeaddrinfo.c
 
 SRCS		=	$(addprefix $(SRCDIR), $(SRCFILES))
 OBJS		=	$(addprefix $(OBJDIR), $(SRCFILES:.c=.o))

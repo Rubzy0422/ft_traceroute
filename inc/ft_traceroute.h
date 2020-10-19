@@ -1,83 +1,103 @@
 #ifndef FT_TRACEROUTE_H
-# define FT_TRACEROUTE_H
+#define FT_TRACEROUTE_H
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-
-#include <netinet/in.h> 
-#include <netinet/ip_icmp.h>  
-#include <fcntl.h> 
-#include <signal.h>
-
+#include <unistd.h> 
+#include <stdio.h> 
 #include <sys/types.h>
-#include <sys/socket.h>
+#include <sys/socket.h> 
+#include <stdlib.h> 
+#include <netinet/in.h> 
+#include <netinet/in_systm.h>
+#include <netinet/ip.h> 
+#include <netinet/ip_icmp.h>
 #include <netdb.h>
-
+#include <string.h> 
+#include <arpa/inet.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/signal.h>
+#include <errno.h>
 #include <libft.h>
 
 #define P_NAME "ft_traceroute"
-# define NI_MAXHOST			1025
-# define NI_MAXSERV			32
-# define NI_NUMERICSERV 	2
-#define PING_PKT_SIZE		60 
+#define BUFSIZE		1025
+#define NI_MAXHOST	1025
 
-typedef enum {false , true} bool;
+#define u_int	unsigned int
+#define u_short unsigned short
 
-typedef struct		ping_pkt 
+typedef struct		s_proto
 {
-	struct icmphdr hdr; 
-	char msg[PING_PKT_SIZE -sizeof(struct icmphdr)]; 
-}					ping_pkt; 
+	struct sockaddr	*sa_send;
+	struct sockaddr	*sa_recv;
+	socklen_t		sa_len;
+	int				icmpproto;
+}					t_proto;
 
-typedef struct			s_trace
-{
-	int					icmpfd;
-	struct sockaddr_in	to;
-	struct sockaddr_in	from;
-	int					ttl;
-	struct timeval		tsent;
-	ssize_t				size;
-	char				*hostname;
-	char				*hostaddr;
-}						t_trace;
+typedef __sighandler_t sighandler_t;
 
 typedef struct		s_env
 {
-	char			*hostname;
-	char			*hostaddr;
-	struct addrinfo	*res;
-	int				pid;
-	t_trace			icmp;
-	t_trace			p_icmp;
-	int				seqnum;
-	int				maxtries;
-	int				maxhops;
-	char			*str;
+	int 			errcode;
+	int				flag;
+	pid_t			pid;
+	int				nsent;
+	int				count;
+	int				datalen;
+	int				sockfd;
+	int				sockset;
+	char			recvbuf[BUFSIZE];
+	char			sendbuf[BUFSIZE];
+	int 			maxtries;
+	int				ttl;
+	int				maxhop;
+	int				dest_reached;
+	char			last[128];
+	char			host_name[NI_MAXHOST];
+	char			*host;
+	struct timeval	tvsend;
+	int				check;
+	t_proto			pr;
 }					t_env;
 
-void				setup_env(t_env *env);
+
+/* ========== packet ======================================================== */
+void				send_packet(t_env *);
+unsigned short		checksum(unsigned short *addr, int len);
+
+/* ========== packet_handel.c =============================================== */
+void 				handel_ttl(struct timeval *tvrecv, char *ipaddr,
+					t_env *env);
+void				handel_echo_reply(t_env *env, struct icmp *icmp, 
+					int icmplen, char *ipaddr, struct timeval *tvrecv);
+void				handel_other(struct timeval *tvrecv, struct icmp *icmp, 
+					char *ipaddr, t_env *env);
+void				process_packet(char *ptr, ssize_t len,
+					struct timeval *tvrecv, t_env *env);
+
+
+/* ========== Addrinfo ====================================================== */
+struct addrinfo		*get_host_ai(const char *host, const char *serv, int family,
+					int socktype);
+char 				*getipaddr(const struct sockaddr *sa, char *hostname);
+
+/* ========== MAIN ========================================================== */
+int					main(int argc, char **argv);
+void				sig_alrm();
+void				setupenv(t_env *env);
 char 				*parse_args(int argc, char **argv);
-void				display_help();
-struct addrinfo		*dns_lookup(t_env *env, const char *host);
-char				*reverse_dns_lookup(char *s_ipv4_addr);
-void				sendloop(t_env *env);
-void				InterruptHandler();
+void				display_help(void);
 
-void				send_probes(t_env *env, fd_set *readset, int hop);
-int					send_echo(t_env *env);
-int					read_echo(t_env *env, int try, int hop);
+/* ========== utils ========================================================= */
+void				ft_error(char *msg, int errcode);
+void				*ft_calloc(size_t blocks, size_t size);
 
-int					sameprevious(t_env *env);
-void				setprevious(t_env *env);
+/* ========== traffic ======================================================= */
+void				pingloop(t_env *env);
 
-unsigned short		checksum(void *buffer, int size);
-void				ttl_advance(t_trace * icmp);
-
-double				ft_timediff(struct timeval s, struct timeval e);
+/* ================== time ================================================== */
+double				time_sub(struct timeval *out, struct timeval *in);
+/* ================== ft_freeaddrinfo ======================================= */
 void				ft_freeaddrinfo(struct addrinfo *head);
 
 #endif
