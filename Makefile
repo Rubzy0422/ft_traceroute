@@ -53,7 +53,7 @@ $(LIBFT_LIB): $(LIBFT_DIR)
 	@make -C $(LIBFT_DIR)
 
 $(LIBFT_DIR):
-	@git clone http://gihub.com/rubzy0422/libft.git 
+	@git clone https://github.com/rubzy0422/libft
 
 $(NAME): $(LIBFT_LIB) $(OBJDIR) $(OBJS)
 	@$(CC) -lm $(FLAGS) -o $(NAME) $(OBJS) $(LIBFT_LIB)
