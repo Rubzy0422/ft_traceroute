@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/17 12:24:12 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/19 15:03:54 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/20 19:09:02 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,12 @@ void	handelerror(int errcode, const char *host)
 {
 	if (errcode == -2)
 		printf("%s: Name or service not known\n", host);
-	if (errcode == -3)
+	else if (errcode == -3)
 		printf("%s: Temporary failure in name resolution\n", host);
+	else if (errcode == -5)
+		printf("%s: No address associated with hostname\n", host);
+	else 
+		printf("%s Undefined error errocode: %d\n", host, errcode);
 	exit(0);
 }
 

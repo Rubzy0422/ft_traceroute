@@ -6,7 +6,7 @@
 /*   By: rcoetzer <rcoetzer@student.wethinkcode.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/17 13:02:20 by rcoetzer          #+#    #+#             */
-/*   Updated: 2020/10/19 16:16:26 by rcoetzer         ###   ########.fr       */
+/*   Updated: 2020/10/20 18:38:27 by rcoetzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,12 @@ int		main(int argc, char **argv)
 	struct addrinfo	*ai;
 	t_env			env;
 	char			*ipaddr;
+	char			*hostname;
 	
-	env.host= ft_strdup(parse_args(argc,argv));
-	if (!env.host)
+	hostname = parse_args(argc,argv);
+	if (hostname)
+		env.host = ft_strdup(hostname);
+	else
 		display_help();
 	setupenv(&env);
 	signal(SIGALRM, sig_alrm);
